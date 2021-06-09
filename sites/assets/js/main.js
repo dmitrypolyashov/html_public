@@ -1,260 +1,320 @@
+'use strict';
+
 (function ($) {
-  "use strict";
+"use strict";
 
-  /*----------------------------------
-  # header sticky 
-  -----------------------------------*/
+	
 
-  var activeSticky = $("#active-sticky"),
-    winDow = $(window);
-  winDow.on("scroll", function () {
-    var scroll = $(window).scrollTop(),
-      isSticky = activeSticky;
-    if (scroll < 1) {
-      isSticky.removeClass("is-sticky");
-    } else {
-      isSticky.addClass("is-sticky");
-    }
-  });
+	/**
+   * [isMobile description]
+   * @type {Object}
+   */
+	window.isMobile = {
+		Android: function Android() {
+			return navigator.userAgent.match(/Android/i);
+		},
+		BlackBerry: function BlackBerry() {
+			return navigator.userAgent.match(/BlackBerry/i);
+		},
+		iOS: function iOS() {
+			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+		},
+		Opera: function Opera() {
+			return navigator.userAgent.match(/Opera Mini/i);
+		},
+		Windows: function Windows() {
+			return navigator.userAgent.match(/IEMobile/i);
+		},
+		any: function any() {
+			return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
+		}
+	};
+	window.isIE = /(MSIE|Trident\/|Edge\/)/i.test(navigator.userAgent);
+	window.windowHeight = window.innerHeight;
+	window.windowWidth = window.innerWidth;
 
-  /*----------------------------------
-  # Off Canvas Menu
-  -----------------------------------*/
+	/**
+   * Match height 
+   */
+	$('.row-eq-height > [class*="col-"]').matchHeight();
 
-  var $offcanvasNav = $("#offcanvas-menu a");
-  $offcanvasNav.on("click", function () {
-    var link = $(this);
-    var closestUl = link.closest("ul");
-    var activeLinks = closestUl.find(".active");
-    var closestLi = link.closest("li");
-    var linkStatus = closestLi.hasClass("active");
-    var count = 0;
+	var myEfficientFn = debounce(function () {
+		$('.row-eq-height > [class*="col-"]').matchHeight();
+	}, 250);
 
-    closestUl.find("ul").slideUp(function () {
-      if (++count == closestUl.find("ul").length)
-        activeLinks.removeClass("active");
-    });
+	window.addEventListener('resize', myEfficientFn);
 
-    if (!linkStatus) {
-      closestLi.children("ul").slideDown();
-      closestLi.addClass("active");
-    }
-  });
+	/**
+   * [debounce description]
+   * @param  {[type]} func      [description]
+   * @param  {[type]} wait      [description]
+   * @param  {[type]} immediate [description]
+   * @return {[type]}           [description]
+   */
+	function debounce(func, wait, immediate) {
+		var timeout;
+		return function () {
+			var context = this,
+				    args = arguments;
+			var later = function later() {
+				timeout = null;
+				if (!immediate) func.apply(context, args);
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) func.apply(context, args);
+		};
+	}
 
-  //   Progress
-  var element = $(".ht-progress");
-  element.each(function () {
-    var $element = $(this);
-    $element.waypoint(
-      function () {
-        // Progress bar
-        var progressBar = $(".progress-bar"),
-          progressBarSpan = $(".progress-bar span");
-        progressBar.each(function () {
-          var eachBarWidth = $(this).attr("aria-valuenow");
-          $(this).width(eachBarWidth + "%");
-        });
-        progressBarSpan.addClass("opacity");
-      },
-      {
-        offset: $element.data("offset"),
-      }
-    );
-  });
+	$(document).ready(function () {
+		$("#datepicker").datepicker();
+	});
+	/**
+   * Select2
+   */
 
-  /*-----------------------------------
-  # case details carousel
-  ------------------------------ */
-  var caseDetailsCarousel = new Swiper(
-    ".case-details-carousel .swiper-container",
-    {
-      loop: true,
-      speed: 1000,
-      autoplay: true,
-      slidesPerView: 1,
-      spaceBetween: 0,
-      navigation: {
-        nextEl: ".case-details-carousel .swiper-button-next",
-        prevEl: ".case-details-carousel .swiper-button-prev",
-      },
-    }
-  );
-  /*-----------------------------------
-  # service-carousel
-  ------------------------------ */
-  var serviceCarousel = new Swiper(".service-carousel .swiper-container", {
-    loop: true,
-    speed: 800,
-    autoplay: true,
-    slidesPerView: 1,
-    spaceBetween: 0,
-    navigation: {
-      nextEl: ".service-carousel .swiper-button-next",
-      prevEl: ".service-carousel .swiper-button-prev",
-    },
-  });
+	$(".select__module").select2({
+		placeholder: "What would you like to do ?"
+	});
 
-  /*-----------------------------------
-  # brand-carousel
-  ------------------------------ */
+	$(".select__module2").select2({
+		placeholder: "Where would you like to go ?"
+	});
 
-  var brandCarousel = new Swiper(".brand-carousel .swiper-container", {
-    loop: true,
-    speed: 800,
-    autoplay: true,
-    slidesPerView: 1,
-    spaceBetween: 0,
-    pagination: false,
-    navigation: false,
-    // Responsive breakpoints
-    breakpoints: {
-      0: {
-        slidesPerView: 1,
-      },
-      576: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 3,
-      },
+	// $(".select__module").on('select2:opening select2:closing', function( event ) {
+	//     var $searchfield = $(this).parent().find('.select2-search__field');
+	//     $searchfield.prop('disabled', true);
+	// });
+	/**
+   * Masonry
+   */
+	$('.grid__inner').masonry({
+		itemSelector: '.grid-item',
+		columnWidth: '.grid-sizer'
+	});
 
-      992: {
-        slidesPerView: 4,
-      },
-      1200: {
-        slidesPerView: 5,
-      },
-    },
-  });
+	/**
+   * grid css
+   */
 
-  /*-----------------------------------
-  # product carousel1
-  ------------------------------ */
+	$.fn.reCalWidth = function () {
+		var $self = $(this);
+		$self.on('reCalWidth', function () {
+			var _self = $(this);
+			_self.css('width', '');
+			var width = Math.floor(_self.width());
+			_self.css('width', width + 'px');
+			var height = Math.floor(_self.parent().children('.wide').width() / 2);
+			_self.parent().children('.wide').css('height', height + 'px');
+		});
+		$(window).on('resize', function () {
+			$self.trigger('reCalWidth');
+		});
+	};
+	function work() {
+		$('.grid-css').each(function () {
+			var workWrapper = $(this),
+				    workContainer = $('.grid__inner', workWrapper),
+				    filters = $('.filter', workWrapper),
+				    filterCurrent = $('.current a', filters),
+				    filterLiCurrent = $('.current', filters),
+				    duration = 0.3;
+			workContainer.imagesLoaded(function () {
 
-  var caseCarousel = new Swiper(".case-carousel .swiper-container", {
-    loop: true,
-    speed: 800,
-    spaceBetween: 30,
-    pagination: false,
-    centeredSlides: true,
-    navigation: {
-      nextEl: ".case-carousel .swiper-button-next",
-      prevEl: ".case-carousel .swiper-button-prev",
-    },
-    observer: true,
-    observeParents: true,
-    // Responsive breakpoints
-    breakpoints: {
-      // when window width is >= 480px
-      0: {
-        slidesPerView: 1,
-      },
-      // when window width is >= 640px
-      576: {
-        slidesPerView: 1,
-      },
-      768: {
-        slidesPerView: 2,
-      },
-      991: {
-        slidesPerView: 2,
-      },
+				// Fix Height
+				if (workWrapper.hasClass('grid-css--fixheight')) {
+					workContainer.find('.grid-item__content-wrapper').matchHeight();
+				}
 
-      // when window width is >= 640px
-      1200: {
-        slidesPerView: 3,
-      },
-    },
-  });
+				workContainer.isotope({
+					layoutMode: 'masonry',
+					itemSelector: '.grid-item',
+					transitionDuration: duration + 's',
+					masonry: {
+						columnWidth: '.grid-sizer'
+					}
+					// hiddenStyle: {},
+					// visibleStyle: {}
+				});
+			});
+			filters.on('click', 'a', function (e) {
+				e.preventDefault();
+				var $el = $(this);
+				var selector = $el.attr('data-filter');
+				filters.find('.current').removeClass('current');
+				$el.parent().addClass('current');
+				workContainer.isotope({
+					filter: selector
+				});
+			});
 
-  /*-----------------------------------
-  # product carousel2
-  ------------------------------ */
+			filters.find('.select-filter').change(function () {
+				var $el = $(this);
+				var selector = $el.val();
+				workContainer.isotope({
+					filter: selector
+				});
+			});
 
-  var testimonialCarousel = new Swiper(
-    ".testimonial-carousel .swiper-container",
-    {
-      loop: true,
-      speed: 1000,
-      slidesPerView: 1,
-      spaceBetween: 0,
-      autoplay: {
-        delay: 2000,
-      },
-      pagination: false,
-      navigation: {
-        nextEl: ".testimonial-carousel .swiper-button-next",
-        prevEl: ".testimonial-carousel .swiper-button-prev",
-      },
-    }
-  );
+			$('.grid-item', workWrapper).reCalWidth();
+		});
+	}
+	work();
 
-  /*----------------------------
-  # Mail Chip Ajax active
-  ------------------------------*/
-  var mCForm = $("#mc-form");
-  mCForm.ajaxChimp({
-    callback: mailchimpCallback,
-    //Replace this with your own mailchimp post URL. Don't remove the "". Just paste the url inside "".
-    url:
-      "http://devitems.us11.list-manage.com/subscribe/post?u=6bbb9b6f5827bd842d9640c82&id=05d85f18ef",
-  });
-  function mailchimpCallback(resp) {
-    if (resp.result === "success") {
-      alert(resp.msg);
-    } else if (resp.result === "error") {
-      alert(resp.msg);
-    }
-    return false;
-  }
+	/**
+   * Swiper
+   */
+	$('.swiper__module').each(function () {
+		var self = $(this),
+			    wrapper = $('.swiper-wrapper', self),
+			    optData = eval('(' + self.attr('data-options') + ')'),
+			    optDefault = {
+			paginationClickable: true,
+			pagination: self.find('.swiper-pagination-custom'),
+			nextButton: self.find('.swiper-button-next-custom'),
+			prevButton: self.find('.swiper-button-prev-custom'),
+			spaceBetween: 30
+		},
+			    options = $.extend(optDefault, optData);
+		wrapper.children().wrap('<div class="swiper-slide"></div>');
+		var swiper = new Swiper(self, options);
 
-  AOS.init({
-    duration: 1500, // values from 0 to 3000, with step 50ms
-    disable: false, // accepts following values: 'phone', 'tablet', 'mobile', boolean, expression or function
-    offset: 0, // offset (in px) from the original trigger point
-    once: true,
-    easing: "ease",
-  });
+		function thumbnails(selector) {
 
-  $("select").selectric({
-    maxHeight: 200,
-  });
+			if (selector.length > 0) {
+				var wrapperThumbs = selector.children('.swiper-wrapper'),
+					    optDataThumbs = eval('(' + selector.attr('data-options') + ')'),
+					    optDefaultThumbs = {
+					spaceBetween: 10,
+					centeredSlides: true,
+					slidesPerView: 3,
+					touchRatio: 0.3,
+					slideToClickedSlide: true,
+					pagination: selector.find('.swiper-pagination-custom'),
+					nextButton: selector.find('.swiper-button-next-custom'),
+					prevButton: selector.find('.swiper-button-prev-custom')
+				},
+					    optionsThumbs = $.extend(optDefaultThumbs, optDataThumbs);
+				wrapperThumbs.children().wrap('<div class="swiper-slide"></div>');
+				var swiperThumbs = new Swiper(selector, optionsThumbs);
+				swiper.params.control = swiperThumbs;
+				swiperThumbs.params.control = swiper;
+			}
+		}
+		thumbnails(self.next('.swiper-thumbnails__module'));
+	});
 
-  /*----------------------------
-  #  Copy Right Year Update
-  -------------------------------*/
+	/**
+  * Footer
+  */
 
-  $("#currentYear").text(new Date().getFullYear());
-  /*----------------------------
-  #  scrollUp
-  -------------------------------*/
-  $.scrollUp({
-    scrollName: "scrollUp",
-    // Element ID
-    scrollDistance: 400,
-    // Distance from top/bottom before showing element (px)
-    scrollFrom: "top",
-    // 'top' or 'bottom'
-    scrollSpeed: 200,
-    // Speed back to top (ms)
-    easingType: "linear",
-    // Scroll to top easing (see http://easings.net/)
-    animation: "fade",
-    // Fade, slide, none
-    animationSpeed: 400,
-    // Animation speed (ms)
-    scrollTrigger: false,
-    // Set a custom triggering element. Can be an HTML string or jQuery object
-    scrollTarget: false,
-    // Set a custom target element for scrolling to. Can be element or number
-    scrollText: '<i class="icofont-arrow-up"></i>',
-    // Text for element, can contain HTML
-    scrollTitle: false,
-    // Set a custom <a> title if required.
-    scrollImg: false,
-    // Set true to use image
-    activeOverlay: false,
-    // Set CSS color to display scrollUp active point, e.g '#00FFFF'
-    zIndex: 214, // Z-Index for the overlay
-  });
+	$('#back-to-top').on('click', function (e) {
+		e.preventDefault();
+		$('html,body').animate({
+			scrollTop: 0
+		}, 700);
+	});
+	//*
+	// Header
+	//*
+
+
+	var wh = $(window).height(),
+		    half = wh / 2,
+		    headerHeight = $('header').outerHeight();
+
+	$(window).scroll(function () {
+		var scrollTop = $(window).scrollTop();
+
+		if (scrollTop >= half) {
+			$('header').addClass('is-scroll');
+		} else {
+			$('header').removeClass('is-scroll');
+		}
+	});
+
+	$('.onepage-nav').dropdownMenu({
+		menuClass: 'onepage-menu',
+		breakpoint: 1200,
+		toggleClass: 'active',
+		classButtonToggle: 'navbar-toggle',
+		subMenu: {
+			class: 'sub-menu',
+			parentClass: 'menu-item-has-children',
+			toggleClass: 'active'
+		}
+	});
+
+	$('.onepage-nav').onePageNav({
+		currentClass: 'current-menu-item',
+		scrollOffset: headerHeight
+	});
+
+	$(document).ready(function () {
+		$('.header__lang_box').hide();
+		$('.header__lang > a').click(function (e) {
+			e.preventDefault();
+			$(this).next().slideToggle();
+		});
+	});
+
+	//*
+	// Back to top
+	//*
+
+	$(window).scroll(function () {
+		var wh = $(window).height(),
+			    scrollTop = $(window).scrollTop();
+
+		if (scrollTop >= wh) {
+			$('#back-to-top').addClass('is-visible');
+		} else {
+			$('#back-to-top').removeClass('is-visible');
+		}
+	});
+
+	$(document).on('click', '.swiper-button-custom.style-02 .swiper-button-prev-custom', function (event) {
+		event.preventDefault();
+		$(".swiper-container--style1 .swiper-button-prev-custom").click();
+	});
+
+	$(document).on('click', '.swiper-button-custom.style-02 .swiper-button-next-custom', function (event) {
+		event.preventDefault();
+		$(".swiper-container--style1 .swiper-button-next-custom").click();
+	});
+
+	var test = $('.swiper-container--style1').height();
+	// alert(test);
+	$('.swiper-button-custom.style-02').height(test).css('top', -test);
+
+	var h_boxSearch = $('.box-search-wrapper').outerHeight();
+	// $('.box-search-wrapper').before('<div class="fixed_height_box_search" style="height:' + h_boxSearch + 'px"></div>');
+
+	// var vitri = $('.box-search').offset().top;
+	// $(window).scroll(function(event) {
+	// var scrollTop = $(window).scrollTop();
+
+	// if(scrollTop>vitri) {
+	// 	$('.box-search-wrapper').addClass('sticky');
+	// }
+	// else {
+	// 	$('.box-search-wrapper').removeClass('sticky');
+	// }
+
+	// if(scrollTop>vitri) {
+	// 	$('.header.header--fixed').css('position', 'absolute');
+	// }
+	// else {
+	// 	$('.header.header--fixed').css('position', 'fixed');
+	// }
+	// });
+
+	var waypoint = new Waypoint({
+		element: document.getElementById('box-search'),
+		handler: function handler(direction) {
+			console.log('Scrolled to waypoint!');
+		}
+	});
+	
 })(jQuery);
