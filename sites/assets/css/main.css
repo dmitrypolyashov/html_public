@@ -3363,11 +3363,13 @@ ul {
 .hero__main_slider .swiper-slide-active .hero__title {
     transform: translateY(0);
     opacity: 1;
+    margin-left: 23%;
 }
 
 .hero__main_slider .swiper-slide-active .hero__info {
     transform: translateY(0);
     opacity: 1;
+    margin-left: 23%;
 }
 
 @media (min-width: 1201px) {
