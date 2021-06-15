@@ -3284,7 +3284,7 @@ ul {
 
 @media (min-width: 320px) {
     .hero__box_info {
-        bottom: calc(28.75vw - 0%);
+        bottom: calc(15.75vw - 0%);
     }
 }
 
